@@ -1,6 +1,8 @@
 defmodule Elixir18.MixProject do
   use Mix.Project
 
+  @except_host [:rpi, :rpi2, :rpi3, :rpi0, :bbb, :x86_64]
+
   def project do
     [
       app: :elixir_18,
@@ -32,20 +34,17 @@ defmodule Elixir18.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      # Dependencies for all targets
       {:nerves, github: "nerves-project/nerves", branch: "elixir-18", override: true, runtime: false},
       {:shoehorn, "~> 0.4"},
       {:ring_logger, "~> 0.6"},
-      {:toolshed, "~> 0.2"}
-    ] ++ deps(Mix.target())
-  end
+      {:toolshed, "~> 0.2"},
 
-  # Specify target specific dependencies
-  defp deps(:host), do: []
+      # Dependencies for all targets except :host
+      {:nerves_runtime, "~> 0.6", targets: @except_host},
+      {:nerves_init_gadget, "~> 0.4", targets: @except_host},
 
-  defp deps(_target) do
-    [
-      {:nerves_runtime, "~> 0.6"},
-      {:nerves_init_gadget, "~> 0.4"},
+      # Dependencies for specific targets
       {:nerves_system_rpi, "~> 1.5", runtime: false, targets: :rpi},
       {:nerves_system_rpi0, "~> 1.5", runtime: false, targets: :rpi0},
       {:nerves_system_rpi2, "~> 1.5", runtime: false, targets: :rpi2},
